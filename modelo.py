@@ -2,6 +2,8 @@ import numpy as np
 import librosa
 from python_speech_features import mfcc
 import os
+import pickle
+import parselmouth
 
 def segmentAudio(data, sr, seg_duration=0.05, hop_duration=0.025):
 
@@ -25,8 +27,16 @@ def extractFeatures(segments, sr):
         energy = np.sum(segment**2) / len(segment)
         zcr_val = zero_crossing_rate(segment)
         mfcc_feat = mfcc(segment, samplerate=sr, numcep=12, nfft=1024)
-        mfcc_mean = np.mean(mfcc_feat, axis=0)
-        feature_vector = [energy, zcr_val] + mfcc_mean.tolist()
+        mfcc_feat = mfcc(segment, samplerate=sr, numcep=12, nfft=1024)
+        delta_feat = delta(mfcc_feat, 2)
+        delta_delta_feat = delta(delta_feat, 2)
+        mfcc_combined = np.hstack([
+            np.mean(mfcc_feat, axis=0),
+            np.mean(delta_feat, axis=0),
+            np.mean(delta_delta_feat, axis=0)
+        ])
+
+        feature_vector = [energy, zcr_val] + mfcc_combined.tolist()
         features.append(feature_vector)
     return np.array(features)
 
@@ -50,7 +60,7 @@ def Dataset(archivos, seg_duration=0.05, hop_duration=0.025):
         all_features = np.array([])
     return all_features
 
-#archivos="direccion dataset"
+archivos="direccion dataset"
 
 from hmmlearn import hmm
 
@@ -123,6 +133,6 @@ train_dict, test_dict = dividir_dataset(dataset_dict)
 modelos = entrenar_modelos_hmm(dataset_dict)
 evaluar_modelos(modelos, test_dict)
 
-pred, scores = clasificar_audio(modelos, 'prueba.wav')
-print("Palabra predicha:", pred)
-print("Scores:", scores)
+
+with open('modelos_entrenados.pkl', 'wb') as archivo:
+    pickle.dump(modelos, archivo)
