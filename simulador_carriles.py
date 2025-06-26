@@ -7,6 +7,7 @@ import numpy as np
 from python_speech_features import mfcc
 from hmmlearn import hmm
 import pickle
+from python_speech_features import delta
 
 # === ARCHIVOS DE IMAGEN ===
 ruta_pista = "pista.jpg"
