@@ -21,6 +21,7 @@ def segmentAudio(data, sr, seg_duration=0.05, hop_duration=0.025):
 def zero_crossing_rate(signal):
     return np.mean(np.abs(np.diff(np.sign(signal))))
 
+from python_speech_features import delta
 def extractFeatures(segments, sr):
     features = []
     for segment in segments:
