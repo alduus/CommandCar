@@ -79,10 +79,6 @@ def extract_type_from_calle_raw(calle_original: str):
 
 #aca respeta y regresa como viene en vdi
 def normalize_row(row: dict) -> dict:
-    """
-    - Si 'calle' tiene prefijo de tipo de vía: lo mueve a 'tipo_via' tal cual y deja el resto en 'calle'.
-    - Si no hay prefijo: no cambia nada (se respeta 'calle' y 'tipo_via' originales).
-    """
     calle = row.get("calle")
     tipo_actual = row.get("tipo_via")
     nuevo_tipo, nueva_calle = extract_type_from_calle_raw(calle)
@@ -96,7 +92,6 @@ def normalize_row(row: dict) -> dict:
     return row
 
 
-# ------------------ Conexión a Postgres ----------------
 def connect_db():
     params = {
         "host": os.getenv("PGHOST", "localhost"),
